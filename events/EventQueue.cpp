@@ -78,4 +78,10 @@ void EventQueue::chain(EventQueue *target)
         equeue_chain(&_equeue, 0);
     }
 }
+
+void EventQueue::read_stats(size_t *never_allocated, size_t *largest_free, size_t *total_free, size_t *failed_allocations)
+{
+    equeue_read_stats(&_equeue, never_allocated, largest_free, total_free, failed_allocations);
+}
+
 }

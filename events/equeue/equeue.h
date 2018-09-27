@@ -57,6 +57,7 @@ struct equeue_event {
 // Event queue structure
 typedef struct equeue {
     struct equeue_event *queue;
+    size_t failed_allocations;
     unsigned tick;
     bool break_requested;
     uint8_t generation;
@@ -222,6 +223,23 @@ void equeue_background(equeue_t *queue,
 // the context of a dispatch loop while still being managed independently.
 void equeue_chain(equeue_t *queue, equeue_t *target);
 
+// Read event queue statistical information
+//
+// This function can be used to read statistical data about
+// memory usage of the queue via parameters.
+//
+// All parameters MUST be valid pointers to size_t variables.
+//
+// never_allocated     - Amount of event memory that has been
+//                       never allocated.
+// largest_free        - Largest free memory block available
+//                       for allocation.
+// total_free          - Total free event memory available, note that
+//                       the memory may be fragmented.
+// failed_allocations  - Number of times that the event memory
+//                       allocation has failed.
+//
+void equeue_read_stats(equeue_t *q, size_t *never_allocated, size_t *largest_free, size_t *total_free, size_t *failed_allocations);
 
 #ifdef __cplusplus
 }

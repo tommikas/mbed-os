@@ -183,7 +183,23 @@ public:
      */
     void chain(EventQueue *target);
 
-
+    /** Read event queue statistical information
+     *
+     *  This function can be used to read statistical data about
+     *  memory usage of the queue via parameters.
+     *
+     *  All parameters MUST be valid pointers to size_t variables.
+     *
+     *  @param never_allocated     Amount of event memory that has been
+     *                             never allocated.
+     *  @param largest_free        Largest free memory block available
+     *                             for allocation.
+     *  @param total_free          Total free event memory available, note that
+     *                             the memory may be fragmented.
+     *  @param failed_allocations  Number of times that the event memory
+     *                             allocation has failed.
+     */
+    void read_stats(size_t *never_allocated, size_t *largest_free, size_t *total_free, size_t *failed_allocations);
 
 #if defined(DOXYGEN_ONLY)
     /** Calls an event on the queue

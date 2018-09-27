@@ -63,6 +63,7 @@ int equeue_create(equeue_t *q, size_t size)
 int equeue_create_inplace(equeue_t *q, size_t size, void *buffer)
 {
     // setup queue around provided buffer
+    q->failed_allocations = 0;
     q->buffer = buffer;
     q->allocated = 0;
 
@@ -164,7 +165,7 @@ static struct equeue_event *equeue_mem_alloc(equeue_t *q, size_t size)
         equeue_mutex_unlock(&q->memlock);
         return e;
     }
-
+    q->failed_allocations++;
     equeue_mutex_unlock(&q->memlock);
     return 0;
 }
@@ -620,4 +621,19 @@ void equeue_chain(equeue_t *q, equeue_t *target)
     c->id = 0;
 
     equeue_background(q, equeue_chain_update, c);
+}
+
+void equeue_read_stats(equeue_t *q, size_t *never_allocated, size_t *largest_free, size_t *total_free, size_t *failed_allocations)
+{
+    *never_allocated = q->slab.size;
+    *largest_free = q->slab.size;
+    *total_free = q->slab.size;
+    *failed_allocations = q->failed_allocations;
+
+    for (struct equeue_event **p = &q->chunks; *p; p = &(*p)->next) {
+        (*total_free) += (*p)->size;
+        if ((*p)->size > *largest_free) {
+            *largest_free = (*p)->size;
+        }
+    }
 }
